@@ -152,7 +152,7 @@ jobs:
   build-ios:
     needs: plan
     if: needs.plan.outputs.ios != '[]'
-    runs-on: macos-15
+    runs-on: macos-26   # Expo SDK 58 fails to compile with macos-15's newest Xcode (26.3)
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4

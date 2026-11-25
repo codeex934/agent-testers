@@ -113,7 +113,7 @@ jobs:
           path: src
           persist-credentials: false
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 22 }   # Expo SDK 58 needs Node 22+
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "17" }
       - uses: gradle/actions/setup-gradle@v4   # Gradle cache between runs
@@ -123,6 +123,12 @@ jobs:
           path: ~/.npm
           key: npm-android-${{ hashFiles('**/package-lock.json') }}
           restore-keys: npm-android-
+      - name: App .env from the APP_ENV secret (optional)
+        env:
+          APP_ENV: ${{ secrets.APP_ENV }}
+          APP_DIR: ${{ inputs.source_repo != '' && format('src/{0}', inputs.app_dir) || inputs.app_dir }}
+        run: |
+          if [ -n "$APP_ENV" ]; then printf '%s\n' "$APP_ENV" > "$APP_DIR/.env"; fi
       - name: Build APK (any framework, log kept private)
         env:
           APP_DIR: ${{ inputs.source_repo != '' && format('src/{0}', inputs.app_dir) || inputs.app_dir }}
@@ -159,7 +165,7 @@ jobs:
           path: src
           persist-credentials: false
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 22 }   # Expo SDK 58 needs Node 22+
       - uses: actions/setup-java@v4   # Kotlin Multiplatform builds call Gradle from Xcode
         with: { distribution: temurin, java-version: "17" }
       - name: Latest Xcode
@@ -171,6 +177,12 @@ jobs:
             ~/Library/Caches/CocoaPods
           key: npm-pods-ios-${{ hashFiles('**/package-lock.json') }}
           restore-keys: npm-pods-ios-
+      - name: App .env from the APP_ENV secret (optional)
+        env:
+          APP_ENV: ${{ secrets.APP_ENV }}
+          APP_DIR: ${{ inputs.source_repo != '' && format('src/{0}', inputs.app_dir) || inputs.app_dir }}
+        run: |
+          if [ -n "$APP_ENV" ]; then printf '%s\n' "$APP_ENV" > "$APP_DIR/.env"; fi
       - name: Build Simulator .app (any framework, arm64, unsigned, log kept private)
         env:
           APP_DIR: ${{ inputs.source_repo != '' && format('src/{0}', inputs.app_dir) || inputs.app_dir }}
